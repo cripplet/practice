@@ -15,4 +15,4 @@ if __name__ == '__main__':
 	if argv.pop() == 'test':
 		test()
 	else:
-		solve([ l for l in fileinput.input() ], verbose=True)
+		solve(list(fileinput.input()), verbose=True)
