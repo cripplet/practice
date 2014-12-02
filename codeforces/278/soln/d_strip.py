@@ -61,6 +61,8 @@ def test():
 	assert(solve([ '7 2 2', '1 3 1 2 4 1 2' ]) == 3)
 	assert(solve([ '7 2 2', '1 100 1 100 1 100 1' ]) == -1)
 	assert(solve([ '1 0 1', '0' ]) == 1)
+	assert(solve([ '2 1000000000 2', '-1000000000 1000000000' ]) == -1)
+	assert(solve([ '10 3 3', '1 1 1 1 1 5 6 7 8 9' ], verbose=True) == -1)
 
 if __name__ == '__main__':
 	from sys import argv

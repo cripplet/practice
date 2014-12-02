@@ -5,13 +5,25 @@ def str_to_int(s):
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	pass
+	return int(args[0])
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	n = proc_input(args)
+	n_used = 0
+	steps = 1
+	count = 1
+	while n >= count:
+		n -= count
+		steps += 1
+		count += steps
+	if verbose:
+		print steps - 1
+	return steps - 1
 
 def test():
 	assert(str_to_int('1 2 3') == [ 1, 2, 3 ])
+	assert(solve([ '1' ]) == 1)
+	assert(solve([ '25' ]) == 4)
 
 if __name__ == '__main__':
 	from sys import argv
