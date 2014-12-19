@@ -74,16 +74,15 @@ def thd(conn):
 		l = th(s)
 		q.append([])
 		if l == 0:
-			break
+			flag = 0
+			continue
 		for i in range(l):
 			q[-1].append(th(conn.recv(4)))
 		msg = proc(q[-1])
+		print('thd msg', conn, msg)
 		if msg:
 			msg = trans(msg)
-			try:
-				conn.send(msg)
-			except Exception:
-				flag = 0
+			conn.send(msg)
 		# disconn
 		else:
 			flag = 0
@@ -139,3 +138,4 @@ if __name__ == '__main__':
 		test()
 	else:
 		server_run()
+
