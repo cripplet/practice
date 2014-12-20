@@ -1,21 +1,41 @@
 import fileinput
 
-def str_to_int(s):
+###          ###
+# utility func #
+###          ###
+
+dbug = True
+
+def stoi(s):
 	return([ int(x) for x in s.split() ])
+
+def pd(s):
+	global dbug
+	if dbug:
+		print 'dbug: ', s
+
+###          ###
+# code follows #
+###          ###
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	pass
+	return args
 
 def solve(args, verbose=False):
+	pd('hi')
 	r = proc_input(args)
+	if verbose:
+		pass
+	return None
 
 def test():
-	assert(str_to_int('1 2 3') == [ 1, 2, 3 ])
+	pass
 
 if __name__ == '__main__':
 	from sys import argv
 	if argv.pop() == 'test':
 		test()
 	else:
+		dbug = False
 		solve(list(fileinput.input()), verbose=True)
