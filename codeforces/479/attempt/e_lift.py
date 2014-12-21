@@ -11,10 +11,13 @@ dbug = True
 def stoi(s):
 	return([ int(x) for x in s.split() ])
 
-def pd(s):
+def pd(s, label=''):
 	global dbug
 	if dbug:
-		print 'dbug: ', s
+		header = 'debug:'
+		if label != '':
+			header += ' (%s)\t' % label 
+		print header, s
 
 ###          ###
 # code follows #
@@ -46,11 +49,16 @@ def dp(n, a, b, k):
 	# passed in as 1-indexed
 	def _ps(l, r):
 		if l > r:
-			return 0
-		(lv, rv) = (0, PARTIAL[r - 1])
-		if l > 0:
-			lv = PARTIAL[l - 1]
-		return rv - lv
+			result = 0
+		else:
+			assert(l > 0 and r > 0)
+			# 0-indexed
+			(l, r) = (l - 1, r - 1)
+			(lv, rv) = (0, PARTIAL[r])
+			if l > 0:
+				lv = PARTIAL[l - 1]
+			result = rv - lv
+		return result
 
 	for kp in xrange(1, k):
 		# partial sum initialization
@@ -58,16 +66,14 @@ def dp(n, a, b, k):
 		for x in xrange(n):
 			s += CACHE[kp - 1][x]
 			PARTIAL[x] = s
-
 		for x in xrange(n):
 			# constant time lookup
 			CACHE[kp][x] = 0
 			if len(FLOOR[x]) > 0:
-				CACHE[kp][x] = _ps(FLOOR[x][0], x - 1) + _ps(x + 1, FLOOR[x][-1])
-
+				CACHE[kp][x] = _ps(FLOOR[x][0], x) + _ps(x + 2, FLOOR[x][-1])
 	return CACHE[k - 1][a - 1]
 
-def solve(args, verbose=False):
+def solve(args, verbose=True):
 	(n, a, b, k) = proc_input(args)
 	r = dp(n, a, b, k)
 	if verbose:
@@ -78,9 +84,10 @@ def test():
 	assert(floor_gen(10, 8, 10) == [ 7, 9 ])
 	assert(solve([ '5 2 4 1' ]) == 2)
 	assert(solve([ '5 4 2 1' ]) == 2)
+	assert(solve([ '5 2 4 2' ]) == 2)
 	assert(solve([ '5 3 4 1' ]) == 0)
 	assert(solve([ '2 2 1 1' ]) == 0)
-	assert(solve([ '10 1 10 2' ]) == 44)
+	assert(solve([ '10 1 10 2' ], verbose=True) == 44)
 	solve([ '2222 1206 1425 2222' ])
 
 if __name__ == '__main__':

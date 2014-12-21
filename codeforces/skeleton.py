@@ -9,10 +9,13 @@ dbug = True
 def stoi(s):
 	return([ int(x) for x in s.split() ])
 
-def pd(s):
+def pd(s, label=''):
 	global dbug
 	if dbug:
-		print 'dbug: ', s
+		header = 'debug:'
+		if label != '':
+			header += ' (%s)\t' % label
+		print header, s
 
 ###          ###
 # code follows #
