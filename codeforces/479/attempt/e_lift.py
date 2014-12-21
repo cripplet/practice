@@ -41,9 +41,31 @@ def dp(n, a, b, k):
 	# init, 0-indexed floors
 	for x in xrange(n):
 		CACHE[0][x] = len(floor_gen(n, x + 1, b))
+
+	PARTIAL = [ 0 ] * n
+	# passed in as 1-indexed
+	def _ps(l, r):
+		if l > r:
+			return 0
+		(lv, rv) = (0, PARTIAL[r - 1])
+		if l > 0:
+			lv = PARTIAL[l - 1]
+		return rv - lv
+
 	for kp in xrange(1, k):
-		for x in range(n):
-			CACHE[kp][x] = sum(CACHE[kp - 1][i - 1] for i in FLOOR[x])
+		print kp
+		# partial sum initialization
+		s = 0
+		for x in xrange(n):
+			s += CACHE[kp - 1][x]
+			PARTIAL[x] = s
+
+		for x in xrange(n):
+			# constant time lookup
+			CACHE[kp][x] = 0
+			if len(FLOOR[x]) > 0:
+				CACHE[kp][x] = _ps(FLOOR[x][0], x - 1) + _ps(x + 1, FLOOR[x][-1])
+
 	return CACHE[k - 1][a - 1]
 
 def solve(args, verbose=False):
@@ -60,6 +82,7 @@ def test():
 	assert(solve([ '5 3 4 1' ]) == 0)
 	assert(solve([ '2 2 1 1' ]) == 0)
 	assert(solve([ '10 1 10 2' ]) == 44)
+	solve([ '2222 1206 1425 2222' ])
 
 if __name__ == '__main__':
 	from sys import argv
