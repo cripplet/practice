@@ -35,17 +35,15 @@ def floor_gen(n, x, b):
 def dp(n, a, b, k):
 	# rows of k, cols of x
 	CACHE = []
+	FLOOR = [ floor_gen(n, x + 1, b) for x in xrange(n) ]
 	for kp in xrange(k):
-		l = []
-		for x in xrange(n):
-			l.append(None)
-		CACHE.append(l)
+		CACHE.append([ None ] * n)
 	# init, 0-indexed floors
 	for x in xrange(n):
 		CACHE[0][x] = len(floor_gen(n, x + 1, b))
 	for kp in xrange(1, k):
 		for x in range(n):
-			CACHE[kp][x] = sum(CACHE[kp - 1][i - 1] for i in floor_gen(n, x + 1, b))
+			CACHE[kp][x] = sum(CACHE[kp - 1][i - 1] for i in FLOOR[x])
 	return CACHE[k - 1][a - 1]
 
 def solve(args, verbose=False):
