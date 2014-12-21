@@ -53,7 +53,6 @@ def dp(n, a, b, k):
 		return rv - lv
 
 	for kp in xrange(1, k):
-		print kp
 		# partial sum initialization
 		s = 0
 		for x in xrange(n):
