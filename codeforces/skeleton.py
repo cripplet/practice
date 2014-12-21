@@ -23,7 +23,6 @@ def proc_input(args):
 	return args
 
 def solve(args, verbose=False):
-	pd('hi')
 	r = proc_input(args)
 	if verbose:
 		pass
