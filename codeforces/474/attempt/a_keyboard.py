@@ -6,6 +6,9 @@ import fileinput, math
 
 dbug = True
 
+def stoi(s):
+	return([ int(x) for x in s.split() ])
+
 def pd(s, label=''):
 	global dbug
 	if dbug:
@@ -13,9 +16,6 @@ def pd(s, label=''):
 		if label != '':
 			header += ' (%s)\t' % label
 		print header, s
-
-def stoi(s):
-	return([ int(x) for x in s.split() ])
 
 def perm(n, k, wheels=True):
 	if wheels:
@@ -43,51 +43,37 @@ def sigma(i, f, wheels=True):
 		assert(f >= 0)
 	return _sigma(f) - _sigma(i - 1)
 
-def ps(l, wheels=True):
-	if wheels:
-		assert(len(l) > 0)
-	r = [ l[0] ] * len(l)
-	for i in xrange(1, len(l)):
-		r[i] = l[i] + r[i - 1]
-	return r
-
-def test_utilities():
-	assert(stoi('1 2 3\n') == [ 1, 2, 3 ])
-	assert(stoi('') == stoi('\n') == [])
-	assert(perm(10, 5) == 30240)
-	assert(comb(10, 5) == 252)
-	assert(tol(0.0, 0.0) == tol(0.0, 0.1, tolerance=0.1) == tol(0.0, 10, tolerance=10) == True)
-	assert(tol(0.0, 0.1) == tol(0.0, 0.1, tolerance=0.1 - 10 ** -9) == False)
-	assert(_sigma(1) == 1)
-	assert(_sigma(10) == 55)
-	assert(sigma(1, 10) == 55)
-	assert(sigma(3, 10) == 52)
-	assert(sigma(10, 10) == 10)
-	assert(sigma(10, 11) == 21)
-	assert(ps([ 1 ]) == [ 1 ])
-	assert(ps([ 1, 2, 3, 4, 5 ]) == [ 1, 3, 6, 10, 15 ])
-
 ###          ###
 # code follows #
 ###          ###
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	d = args[0].strip()
+	s = args[1].strip()
+	return(d, s)
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	(d, s) = proc_input(args)
+	d = 2 * (d == 'L') - 1
+	a = 'qwertyuiopasdfghjkl;zxcvbnm,./'
+	# reverse lookup
+	b = dict(zip(a, range(len(a))))
+	r = ''.join([ a[b[c] + d] for c in s ])
 	if verbose:
-		pass
-	return None
+		print r
+	return r
 
 def test():
-	pass
+	assert(_sigma(10) == 55)
+	assert(sigma(3, 10) == 52)
+	assert(sigma(1, 1) == 1)
+	assert(sigma(3, 4) == 7)
+	assert(solve([ 'R', 's;;upimrrfod;pbr' ], verbose=True) == 'allyouneedislove')
 
 if __name__ == '__main__':
 	from sys import argv
 	if argv.pop() == 'test':
-		test_utilities()
 		test()
 	else:
 		dbug = False
