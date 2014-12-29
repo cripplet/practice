@@ -49,19 +49,23 @@ def sigma(i, f, wheels=True):
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	return(stoi(args[0]))
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	MOD = 10 ** 9 + 7
+	(a, b) = proc_input(args)
+	r = (sigma(1, a) * b + a) * sigma(1, b - 1) % MOD
 	if verbose:
-		pass
-	return None
+		print r
+	return r
 
 def test():
 	assert(_sigma(10) == 55)
 	assert(sigma(3, 10) == 52)
 	assert(sigma(1, 1) == 1)
 	assert(sigma(3, 4) == 7)
+	assert(solve([ '1 1' ]) == 0)
+	assert(solve([ '2 2' ]) == 8)
 
 if __name__ == '__main__':
 	from sys import argv
