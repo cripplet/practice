@@ -78,16 +78,23 @@ def test_utilities():
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	(n, t) = stoi(args[0])
+	return (t, stoi(args[1]))
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	(t, ps) = proc_input(args)
+	ps = dict(zip([ i + 1 for i in xrange(len(ps)) ], ps))
+	c = 1
+	while c < t and c != len(ps) + 1:
+		c += ps[c]
+	r = (c == t)
 	if verbose:
-		pass
-	return None
+		print 'YES' if r else 'NO'
+	return r
 
 def test():
-	pass
+	assert(solve([ '8 4', '1 2 1 2 1 2 1' ], verbose=True) == True)
+	assert(solve([ '8 5', '1 2 1 2 1 1 1' ], verbose=True) == False)
 
 if __name__ == '__main__':
 	from sys import argv

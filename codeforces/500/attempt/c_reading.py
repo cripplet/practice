@@ -78,16 +78,35 @@ def test_utilities():
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	return(stoi(args[1]), stoi(args[2]))
+
+def move(s, w, book):
+	top = s[:s.index(book)]
+	s[0] = book
+	s[1:1 + len(top)] = top
+	return sum([ w[i - 1] for i in top ])
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	(w, p) = proc_input(args)
+	s = []
+	t = 0
+	while t < len(w):
+		try:
+			s.append(p.index(t + 1) + 1)
+		except ValueError as e:
+			pass
+		t += 1
+	r = 0
+	# simulate moves
+	for m in p:
+		r += move(s, w, m)
 	if verbose:
-		pass
-	return None
+		print r
+	return r
 
 def test():
-	pass
+	assert(solve([ '3 5', '1 2 3', '1 3 2 3 1' ]) == 12)
+	assert(solve([ '3 5', '1 2 3', '1 1 1 1 1' ]) == 0)
 
 if __name__ == '__main__':
 	from sys import argv
@@ -97,3 +116,4 @@ if __name__ == '__main__':
 	else:
 		dbug = False
 		solve(list(fileinput.input()), verbose=True)
+

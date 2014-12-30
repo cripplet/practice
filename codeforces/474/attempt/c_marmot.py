@@ -1,4 +1,4 @@
-import fileinput, math
+import fileinput, math, itertools
 
 ###          ###
 # utility func #
@@ -67,22 +67,77 @@ def test_utilities():
 	assert(ps([ 1 ]) == [ 1 ])
 	assert(ps([ 1, 2, 3, 4, 5 ]) == [ 1, 3, 6, 10, 15 ])
 
+def btod(b):
+	return 2 * b - 1
+
 ###          ###
 # code follows #
 ###          ###
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	n = int(args[0])
+	regiments = []
+	for i in xrange(n):
+		regiments.append([ stoi(args[1 + (4 * i) + j]) for j in xrange(4) ])
+	return regiments
+
+def dist((a, b), (x, y)):
+	return (x - a) ** 2 + (y - b) ** 2
+
+def is_sq(coord):
+	for (a, b, c, d) in itertools.permutations(coord):
+		_sq = True
+		_sq &= dist(a, b) == dist(b, c) == dist(c, d) == dist(d, a)
+		_sq &= dist(a, c) == dist(b, d)
+		_sq &= ((dist(a, b) + dist(b, c)) == dist(a, c) and dist(a, b) != dist(a, c))
+		if _sq:
+			break
+	return _sq
+
+def dir(d):
+	return (btod((d & 2) >> 1), btod(d & 1))
+
+def generate((x, y, a, b), d):
+	(dx, dy) = dir(d)
+	(_x, _y) = (x - a, y - b)
+	if dx * dy == 1:
+		(_x, _y) = (_x * dx, _y * dy)
+	else:
+		(_x, _y) = (_y * dy, _x * dx)
+	return(_x + a, _y + b)
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	regiments = proc_input(args)
+	rs = []
+	for k, r in enumerate(regiments):
+		_r = float('inf')
+		for p in xrange(4 ** 4):
+			masks = [ (p & (3 << (2 * i))) >> (2 * i) for i in xrange(4) ]
+			coord = [ generate(r[i], masks[i]) for i in xrange(4) ]
+			if is_sq(coord):
+				_r = min(_r, sum([ dir(x).count(-1) for x in masks ]))
+		if _r == float('inf'):
+			_r = -1
+		rs.append(_r)
 	if verbose:
-		pass
-	return None
+		for r in rs:
+			print r
+	return rs
 
 def test():
-	pass
+	assert(is_sq(((0, 0), (0, 1), (1, 0), (1, 1))) == True)
+	assert(generate((100, 1, 0, 0), 0) == (-100, -1))
+	assert(generate((100, 1, 0, 0), 1) == (1, -100))
+	assert(generate((100, 1, 0, 0), 2) == (-1, 100))
+	assert(generate((100, 1, 0, 0), 3) == (100, 1))
+	assert(solve([ '1', '1 1 0 0', '-1 1 0 0', '-1 1 0 0', '1 -1 0 0' ]) == [ 1 ])
+	assert(solve([ '1', '1 1 0 0', '-2 1 0 0', '-1 1 0 0', '1 -1 0 0' ]) == [ -1 ])
+	assert(solve([ '1', '1 1 0 0', '-1 1 0 0', '-1 1 0 0', '-1 1 0 0' ]) == [ 3 ])
+	assert(solve([ '1', '2 2 0 1', '-1 0 0 -2', '3 0 0 -2', '-1 1 -2 0' ]) == [ 3 ])
+	assert(solve([ '2', '1 1 0 0', '-1 1 0 0', '-1 1 0 0', '1 -1 0 0', '1 1 0 0', '-2 1 0 0', '-1 1 0 0', '1 -1 0 0' ]) == [ 1, -1 ])
+	assert(solve([ '1', '-2248 6528 -2144 6181', '-2245 6663 -2100 7054', '-4378 7068 -4061 7516', '-4274 6026 -3918 5721' ], verbose=True) == [ 8 ])
+
 
 if __name__ == '__main__':
 	from sys import argv
