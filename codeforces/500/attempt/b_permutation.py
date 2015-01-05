@@ -82,65 +82,42 @@ def proc_input(args):
 	m = [ args[2 + i].strip() for i in xrange(len(p)) ]
 	return(p, m)
 
-class ConnectedComponent(object):
-	def __init__(self, v=None, k=None):
-		self.vs = []
-		self.ks = []
-		if v is not None:
-			self.iv(v)
-		if k is not None:
-			self.ik(k)
-
-	def find(self, k):
-		return k in self.ks
-
-	def iv(self, v):
-		if len(self.vs) == 0 or self.vs[0] < v:
-			self.vs.append(v)
-		else:
-			self.vs.insert(0, v)
-
-	def ik(self, k):
-		self.ks.append(k)
-
-	def __str__(self):
-		return '%s, %s' % (str(self.vs), str(self.ks))
-
-	def __add__(self, other):
-		c = ConnectedComponent()
-		for v in self.vs + other.vs:
-			c.iv(v)
-		for k in self.ks + other.ks:
-			c.ik(k)
-		return c
-
 def solve(args, verbose=False):
+	from Queue import Queue as Q
 	(p, m) = proc_input(args)
-	components = [ ConnectedComponent(v, k) for (k, v) in enumerate(p) ]
-	edges = []
-	for i in xrange(len(m)):
-		for j in xrange(i):
-			if m[i][j] == '1':
-				edges.append((i, j))
-	for (s, t) in edges:
-		for k, c in enumerate(components):
-			if c.find(s):
-				i = k
-			if c.find(t):
-				j = k
-		if i != j:
-			components[i] += components[j]
-			components.pop(j)
+	# http://stackoverflow.com/a/8124880/873865
+	comp_id = -1
+	scratch = [ -1 ] * len(p)
+	for n in xrange(len(p)):
+		comp_id += 1
+		q = Q()
+		q.put(n)
+		while not q.empty():
+			node = q.get()
+			# already processed
+			if scratch[node] != -1:
+				continue
+			scratch[node] = comp_id
+			for k, v in enumerate(m[node]):
+				if v == '1':
+					q.put(k)
+	components = [ [] for _ in xrange(len(p)) ]
+	for ind, comp in enumerate(scratch):
+		components[comp].append((p[ind], ind))
 
-	ans = [ 0 for _ in xrange(len(p)) ]
+	res = [ 0 ] * len(p)
 	for c in components:
-		c.vs.sort()
-		c.ks.sort()
-		for i in xrange(len(c.vs)):
-			ans[c.ks[i]] = c.vs[i]
+		if c == []:
+			continue
+		(v, k) = [ list(x) for x in zip(*c) ]
+		v.sort()
+		k.sort()
+		for ind, val in enumerate(v):
+			res[k[ind]] = val
+
 	if verbose:
-		print ' '.join(str(x) for x in ans)
-	return ans
+		print ' '.join([ str(x) for x in res ])
+	return res
 
 def test():
 	assert(solve([ '7', '5 2 4 3 6 7 1', '0001001', '0000000', '0000010', '1000001', '0000000', '0010000', '1001000' ], verbose=True) == [ 1, 2, 4, 3, 6, 7, 5 ])

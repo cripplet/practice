@@ -89,13 +89,9 @@ def move(s, w, book):
 def solve(args, verbose=False):
 	(w, p) = proc_input(args)
 	s = []
-	t = 0
-	while t < len(w):
-		try:
-			s.append(p.index(t + 1) + 1)
-		except ValueError as e:
-			pass
-		t += 1
+	for pp in p:
+		if pp not in s:
+			s.append(pp)
 	r = 0
 	# simulate moves
 	for m in p:
@@ -107,6 +103,7 @@ def solve(args, verbose=False):
 def test():
 	assert(solve([ '3 5', '1 2 3', '1 3 2 3 1' ]) == 12)
 	assert(solve([ '3 5', '1 2 3', '1 1 1 1 1' ]) == 0)
+	solve([ '500 1000', '1 ' * 500, '4 ' * 1000 ])
 
 if __name__ == '__main__':
 	from sys import argv
