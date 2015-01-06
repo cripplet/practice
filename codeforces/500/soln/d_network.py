@@ -81,16 +81,74 @@ def test_utilities():
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	n = int(args[0])
+	e = []
+	c = []
+	for l in args[1:n]:
+		e.append(stoi(l))
+	q = int(args[n])
+	for l in args[n + 1:]:
+		c.append(stoi(l))
+	return(n, e, c)
 
+from collections import defaultdict
+adj_list = defaultdict(list)
+CACHE = defaultdict(int)
+
+def dfs(**kwargs):
+	# build my own stack
+	from Queue import LifoQueue
+	# calc subtree size, given root node and parent
+	global adj_list, CACHE
+	s = LifoQueue()
+	s.put((kwargs['init'], kwargs['parent'], ()))
+	while not s.empty():
+		(n, p, t) = s.get()
+		CACHE[n] = 1
+		for c in t:
+			CACHE[c] += 1
+		# calc total children
+		t += (n, )
+		for c in adj_list[n]:
+			if c != p:
+				s.put((c, n, t))
+	return CACHE[kwargs['init']]
+
+# credit to http://codeforces.com/contest/500/submission/9326111 and
+#	http://codeforces.com/blog/entry/15488
 def solve(args, verbose=False):
-	r = proc_input(args)
+	global adj_list, CACHE
+	adj_list = defaultdict(list)
+	CACHE = defaultdict(int)
+	(n, edges, changes) = proc_input(args)
+	FAC = 3.0 / n / (n - 1)
+	for (a, b, w) in edges:
+		adj_list[a].append(b)
+		adj_list[b].append(a)
+	dfs(init=1, parent=None)
+	S = 0.0
+	for (a, b, w) in edges:
+		# find subtree
+		n_A = min(CACHE[a], CACHE[b])
+		# find nodes in the remaining tree
+		n_B = n - n_A
+		S += 2 * w * n_A * n_B
+	results = []
+	for (r, wp) in changes:
+		(a, b, w) = edges[r - 1]
+		edges[r - 1] = (a, b, wp)
+		n_A = min(CACHE[a], CACHE[b])
+		n_B = n - n_A
+		S -= 2 * (w - wp) * n_A * n_B
+		results.append(FAC * S)
 	if verbose:
-		pass
-	return None
+		for r in results:
+			print r
+	return results
 
 def test():
-	pass
+	assert(solve([ '3', '2 3 5', '1 3 3', '5', '1 4', '2 2', '1 2', '2 1', '1 1' ], verbose=True) == [ 14, 12, 8, 6, 4 ])
+	assert(tol(solve([ '6', '1 5 3', '5 3 2', '6 1 7', '1 4 4', '5 2 3', '5', '1 2', '2 1', '3 5', '4 1', '5 2' ], verbose=True), [ 19.6, 18.6, 16.6, 13.6, 12.6 ]))
 
 if __name__ == '__main__':
 	from sys import argv
