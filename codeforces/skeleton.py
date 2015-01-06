@@ -33,6 +33,8 @@ def comb(n, k, wheels=True):
 def tol(actual, expected, tolerance=10 ** -9):
 	if type(actual) != type([]):
 		(actual, expected) = ([ actual ], [ expected ])
+	if len(actual) != len(expected):
+		return False
 	r = [ expected[i] - tolerance <= actual[i] <= expected[i] + tolerance for i in xrange(len(actual)) ]
 	return sum(r) == len(r)
 
@@ -64,6 +66,8 @@ def test_utilities():
 	assert(comb(10, 5) == 252)
 	assert(tol(0.0, 0.0) == tol(0.0, 0.1, tolerance=0.1) == tol(0.0, 10, tolerance=10) == True)
 	assert(tol(0.0, 0.1) == tol(0.0, 0.1, tolerance=0.1 - 10 ** -9) == False)
+	assert(tol([ 1.0, 1.1 ], [ 2.0, 2.1 ], tolerance=1) == True)
+	assert(tol([ 1, 2 ], [ 1 ]) == tol([ 1 ], [ 1, 2 ]) == False)
 	assert(_sigma(1) == 1)
 	assert(_sigma(10) == 55)
 	assert(sigma(1, 10) == 55)

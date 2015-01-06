@@ -95,24 +95,38 @@ from collections import defaultdict
 adj_list = defaultdict(list)
 CACHE = defaultdict(int)
 
-def dfs(**kwargs):
+# recursive DFS doesn't work so well in Python with recursion > 500
+#	cf. http://codeforces.com/contest/500/submission/9334488
+def dfs():
+	is_visited = defaultdict(int)
 	# build my own stack
-	from Queue import LifoQueue
+	from collections import deque
 	# calc subtree size, given root node and parent
 	global adj_list, CACHE
-	s = LifoQueue()
-	s.put((kwargs['init'], kwargs['parent'], ()))
-	while not s.empty():
-		(n, p, t) = s.get()
-		CACHE[n] = 1
-		for c in t:
-			CACHE[c] += 1
-		# calc total children
-		t += (n, )
+
+	# build the order in which we will inspect the nodes
+	o = []
+
+	# scratch queue
+	s = deque([ 1 ])
+	while len(s):
+		n = s.popleft()
+		o.append(n)
+		is_visited[n] = 1
 		for c in adj_list[n]:
-			if c != p:
-				s.put((c, n, t))
-	return CACHE[kwargs['init']]
+			if is_visited[c]:
+				continue
+			s.append(c)
+
+	# and reverse order -- look at the leaves first
+	o.reverse()
+	for n in o:
+		CACHE[n] = 1
+		for c in adj_list[n]:
+			# if c == p: CACHE[c] isn't computed yet, and thus adds nothing
+			CACHE[n] += CACHE[c]
+
+	return CACHE[1]
 
 # credit to http://codeforces.com/contest/500/submission/9326111 and
 #	http://codeforces.com/blog/entry/15488
@@ -125,7 +139,7 @@ def solve(args, verbose=False):
 	for (a, b, w) in edges:
 		adj_list[a].append(b)
 		adj_list[b].append(a)
-	dfs(init=1, parent=None)
+	dfs()
 	S = 0.0
 	for (a, b, w) in edges:
 		# find subtree
