@@ -1,4 +1,4 @@
-import fileinput, math, collections
+import fileinput, math
 
 ###          ###
 # utility func #
@@ -90,16 +90,64 @@ def test_utilities():
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return args
+	n = int(args[0])
+	d = [ stoi(l) for l in args[1:] ]
+	return(n, d)
 
 def solve(args, verbose=False):
-	r = proc_input(args)
+	(n, d) = proc_input(args)
+
+	# check this is undirected graph
+	succ = True
+	for i in xrange(n):
+		succ &= (d[i][i] == 0)
+		for j in xrange(i):
+			succ &= (d[i][j] == d[j][i] and d[i][j] > 0)
+
+	# given a tree T and nodes o, c, i such that
+	#	1.) o is any node such that d(i, o) < inf
+	#	2.) c is closest adjacent node to i (i.e. min[c](d(i, c)))
+	# consider path P(i, o):
+	#	case 1: if c in P: then we pass through c on the way from i to o
+	#		o -- c -- i
+	#	case 2: else: o is on the 'other side' of i than c
+	#		o -- i -- c
+	#	(here, -- designates actual edges)
+	# case 1: d(o, i) == d(o, c) + d(c, i)
+	# case 2: d(o, c) == d(o, i) + d(i, c)
+	# algebra:
+	#	case 1: d(i, c) == d(o, i) - d(o, c)
+	#	case 2: d(i, c) == d(o, c) - d(o, i)
+	# note that |d(i, c)| == |d(o, i) - d(o, c)|
+	# we can use this property of trees to test for accurate edge weights
+	#	1.) iterate among (i, o) pairs in O(n ** 2) complexity
+	#	2.) for each (i, o) pair, find c of i
+	#	3.) assert that for this (i, o) pair, the above property holds
+	# credit to http://codeforces.com/contest/472/submission/9369316 and discussions with Kevin Wang
+	for i in xrange(n):
+		c = 0;
+		# search for node closest c to node i -- cache this for this loop
+		for o in xrange(n):
+			if i == o:
+				continue
+			if d[i][o] < d[i][c]:
+				c = o
+		# test for property
+		for o in xrange(n):
+			succ &= abs(d[i][c]) == abs(d[o][i] - d[o][c])
+
 	if verbose:
-		pass
-	return None
+		print btos(succ)
+	return succ
 
 def test():
-	pass
+	assert(solve([ '3', '0 2 7', '2 0 9', '7 9 0' ], verbose=True) == True)
+	assert(solve([ '3', '1 2 7', '2 0 9', '7 9 0' ]) == False)
+	assert(solve([ '3', '0 2 2', '7 0 9', '7 9 0' ]) == False)
+	assert(solve([ '3', '0 2 2', '7 0 9', '7 9 0' ]) == False)
+	assert(solve([ '3', '0 1 1', '1 0 1', '1 1 0' ]) == False)
+	assert(solve([ '2', '0 0', '0 0' ]) == False)
+	assert(solve([ '1', '0' ]) == True)
 
 if __name__ == '__main__':
 	from sys import argv
