@@ -6,6 +6,9 @@ import fileinput, math
 
 dbug = True
 
+def btos(b):
+	return 'YES' if b else 'NO'
+
 def pd(s, label=''):
 	global dbug
 	if dbug:
@@ -78,6 +81,8 @@ def test_utilities():
 	assert(ps([ 1, 2, 3, 4, 5 ]) == [ 1, 3, 6, 10, 15 ])
 	assert(btod(0) == -1)
 	assert(btod(1) == 1)
+	assert(btos(True) == 'YES')
+	assert(btos(False) == 'NO')
 
 ###          ###
 # code follows #
