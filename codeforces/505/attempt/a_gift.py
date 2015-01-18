@@ -96,23 +96,16 @@ def solve(args, verbose=False):
 	s = proc_input(args)
 	p = s[::-1]
 	c = 0
-	n = len(s) / 2
-	l = s[n]
-	if len(s) > 2:
-		for k in xrange(len(p) / 2 + 1):
-			if c > 1:
-				break
-			if s[k + c] != p[k]:
-				(n, l) = (len(p) - k, s[k])
-				c += 1
-	elif len(s) == 2:
-		(n, l) = (2, s[0])
+	for k in xrange(len(s) / 2):
+		if s[k] != p[k]:
+			c += 1
+			p = p[:k] + s[k] + p[k:]
+	if c == 0:
+		p = p[:len(s) / 2] + p[len(s) / 2] + p[len(s) / 2:]
 	succ = c < 2
-	if succ:
-		s = s[:n] + l + s[n:]
 	if verbose:
-		print s if succ else 'NA'
-	return s if succ else False
+		print p if succ else 'NA'
+	return p if succ else False
 
 def test():
 	assert(solve([ 'revive' ], verbose=True) == 'reviver')
@@ -121,6 +114,10 @@ def test():
 	assert(solve([ 'e' ], verbose=True) == 'ee')
 	assert(solve([ 'ef' ], verbose=True) == 'efe')
 	assert(solve([ 'kitayuta' ], verbose=True) == False)
+	assert(solve([ 'abcdefedcb' ], verbose=True) == 'abcdefedcba')
+	assert(solve([ 'abcdeedcb' ], verbose=True) == 'abcdeedcba')
+	assert(solve([ 'abcdeedcba' ], verbose=True) == 'abcdeeedcba')
+	assert(solve([ 'fft' ], verbose=True) == 'tfft')
 
 if __name__ == '__main__':
 	from sys import argv
@@ -130,3 +127,4 @@ if __name__ == '__main__':
 	else:
 		dbug = False
 		solve(list(fileinput.input()), verbose=True)
+
