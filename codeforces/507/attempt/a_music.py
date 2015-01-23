@@ -90,33 +90,32 @@ def test_utilities():
 
 # args = [ 'line 1', 'line 2', ... ]
 def proc_input(args):
-	return(stoi(args[0]))
+	(n, k) = stoi(args[0])
+	return(n, k, stoi(args[1]))
 
 def solve(args, verbose=False):
-	(n, a, b) = proc_input(args)
-	c = 6 * n
-	(__a, __b) = (a, b)
-	(a, b) = (min(a, b), max(a, b))
-	_area = a * b
-	_pair = (a, b)
-	if _area < 6 * n:
-		_area = float('inf')
-		for _a in xrange(a, int(math.ceil(c ** 0.5))):
-			_a = float(_a)
-			_b = math.ceil(c / _a)
-			if _b >= b and c <= _a * _b < _area:
-				(_area, _pair) = (int(_a * _b), (int(_a), int(_b)))
-	if __a > a:
-		_pair = _pair[::-1]
+	(n, k, i) = proc_input(args)
+	i = list(enumerate(i))
+	i.sort(key=lambda(k, v): v)
+	i.reverse()
+	res = []
+	l = 0
+	while l < k:
+		(ind, v) = i.pop()
+		if l + v <= k:
+			res.append(ind + 1)
+			l += v
+		else:
+			break
 	if verbose:
-		print _area
-		print _pair[0], _pair[1]
-	return _area, _pair[0], _pair[1]
+		print len(res)
+		print ' '.join([ str(x) for x in res ])
+	return len(res), res
 
 def test():
-	assert(solve([ '3 3 5' ], verbose=True) == (18, 3, 6))
-	assert(solve([ '2 4 4' ]) == (16, 4, 4))
-	assert(solve([ '8 7 5' ], verbose=True) == (48, 8, 6))
+	assert(solve([ '4 10', '1 2 3 4' ], verbose=True) == (4, [ 1, 2, 3, 4 ]))
+	assert(solve([ '5 6', '4 3 1 1 2' ], verbose=True) == (3, [ 3, 4, 5 ]))
+	assert(solve([ '1 3', '4' ]) == (0, []))
 
 if __name__ == '__main__':
 	from sys import argv

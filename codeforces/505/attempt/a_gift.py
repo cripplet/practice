@@ -93,19 +93,19 @@ def proc_input(args):
 	return args[0].strip()
 
 def solve(args, verbose=False):
+	from string import lowercase as l
 	s = proc_input(args)
-	p = s[::-1]
-	c = 0
-	for k in xrange(len(s) / 2):
-		if s[k] != p[k]:
-			c += 1
-			p = p[:k] + s[k] + p[k:]
-	if c == 0:
-		p = p[:len(s) / 2] + p[len(s) / 2] + p[len(s) / 2:]
-	succ = c < 2
+	a = ''
+	for n in xrange(len(s) + 1):
+		for c in l:
+			p = s[:n] + c + s[n:]
+			if p == p[::-1]:
+				a = p
+				break
+	succ = (a != '')
 	if verbose:
-		print p if succ else 'NA'
-	return p if succ else False
+		print a if succ else 'NA'
+	return a if succ else False
 
 def test():
 	assert(solve([ 'revive' ], verbose=True) == 'reviver')
